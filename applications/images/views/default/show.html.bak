@@ -1,0 +1,10 @@
+{{extend 'layout.html'}} 
+<h1> Image: {{=image.title}} </h1>
+<center>
+  <img width="200px" src="{{=URL('download', args=image.file)}}"/>
+</center>
+<p>
+<h3>
+    Number of frame detected: {{=digit_num}}</br>
+    Detect numbers: {{=image.Num_detected}}
+</h3>

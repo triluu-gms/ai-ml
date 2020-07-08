@@ -1,0 +1,85 @@
+# -*- coding: utf-8 -*-
+import cv2
+from keras.models import load_model
+import matplotlib.pyplot as plt
+import numpy as np
+import os
+from urllib.request import urlopen
+import sys
+### required - do no delete
+#def user(): return dict(form=auth())
+#def download(): return response.download(request,db)
+#def call(): return service()
+### end requires
+def index():
+    images = db().select(db.images.ALL, orderby=db.images.title)
+    return dict(images=images)
+
+def error():
+    return dict()
+
+def get_image(image):
+    if (image.file!=None):
+        img1 = os.path.join(request.folder, 'uploads', image.file)
+        response.flash=img1
+        img=cv2.imread(img1)
+    else:
+        resp = urlopen(image.url)
+        data = np.asarray(bytearray(resp.read()),dtype='uint8')
+        img=cv2.imdecode(data, cv2.IMREAD_COLOR)
+    return dict(img=img)
+
+
+def show():
+    image=db.images(request.args(0,cast=int)) or redirect(URL('index'))
+    #image=db(db.images.id==img_id).select()
+    #response.flash = image.file, image.url
+    img = get_image(image)
+    db.images.update_or_insert(Num_detected=loadmodel(img))
+    form = SQLFORM(db.images)
+    if form.process().accepted:
+             response.flash='URL used'
+    comments=db(db.images.id==image.id).select()
+    return dict(image=image, comments=comments, form=form)
+
+def download():
+    return response.download(request,db)
+
+def loadmodel(img):
+    width = 17
+    height = 32
+    dim = (width, height)
+    #img=cv2.imread('/web2py/applications/images/uploads/images.file.8f89d0198785941b.746573742e706e67.png')
+    digit_num =mser(img)
+    if digit_num:
+        response.flash =digit_num.pop()
+        digit_resize=[]
+        for i in range(len(digit_num)):
+            if(len(digit_num[i])>0):
+                digit_resize.append(cv2.resize(digit_num[i],dim,interpolation = cv2.INTER_AREA))
+                digit_resize[i]=(digit_resize[i][...,::-1].astype(np.float32))/255
+        digit_arr2 = np.array(digit_resize)
+        train_model = os.path.join(request.folder, 'private', 'number_model.h5')
+        model = load_model(train_model)
+        pred = model.predict_classes(digit_arr2)
+    else:
+        pred=[]
+    return pred
+
+def mser(cv_image):
+    digit_num = []
+    if (cv_image):
+        vis = cv_image.copy()
+        gray = cv2.cvtColor(cv_image, cv2.COLOR_BGR2GRAY)
+    #gray = cv2.bilateralFilter(gray, 11, 17, 17)
+        edged = cv2.Canny(gray, 30, 200)
+        mser = cv2.MSER_create()
+        regions, _ = mser.detectRegions(edged)
+        for p in regions:
+            xmax, ymax = np.amax(p, axis=0)
+            xmin, ymin = np.amin(p, axis=0)
+            cv2.rectangle(vis, (xmin,ymin), (xmax,ymax), (0, 255, 0), 1)
+            digit_num.append(vis[ymin:ymax,xmin:xmax])
+    else:
+        digit_num=[]
+    return digit_num
