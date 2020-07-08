@@ -13,7 +13,7 @@ Pretrain source: jupyter/keras-model.ipynb
 To start web2py there is NO NEED to install it. Just download to web2py folder and run command line:
     python /web2py/web2py.py -a 'abcd1234' -i 0.0.0.0 -p 8000 &
 That's it!!!
-Access web application from URL: http://IP:8000/
+Access web application from URL: http://YOUR-IP:8000/
 ## web2py directory structure
 
     project/
