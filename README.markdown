@@ -31,23 +31,7 @@ Access web application from URL: http://YOUR-IP:8000/
         applications/              > are the apps
             admin/                 > web based IDE
                 ...
-            examples/              > examples, docs, links
-                ...
-            welcome/               > the scaffolding app (they all copy it)
-                ABOUT
-                LICENSE
-                models/
-                views/
-                controllers/
-                sessions/
-                errors/
-                cache/
-                static/
-                uploads/
-                modules/
-                cron/
-                tests/
-            ...                    > your own apps
+        *    images/                 > multiple digit application
         examples/                  > example config files, mv .. and customize
         extras/                    > other files which are required for building web2py
         scripts/                   > utility and installation scripts
